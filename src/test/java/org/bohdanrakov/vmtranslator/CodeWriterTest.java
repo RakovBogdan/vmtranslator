@@ -7,6 +7,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.bohdanrakov.vmtranslator.commands.CommandType.PUSH;
 import static org.junit.Assert.*;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -40,5 +41,22 @@ public class CodeWriterTest {
 
         assertEquals(expectedAdd, testInstance.getResult());
 
+    }
+
+    @Test
+    public void testPushConstant() {
+        List<String> expectedAdd = new ArrayList<>();
+        expectedAdd.add("@1");
+        expectedAdd.add("D=A");
+        expectedAdd.add("@SP");
+        expectedAdd.add("A=M");
+        expectedAdd.add("M=D");
+        expectedAdd.add("@SP");
+        expectedAdd.add("M=M+1");
+
+        testInstance = new CodeWriter();
+        testInstance.writePushPop(PUSH, "constant", 1);
+
+        assertEquals(expectedAdd, testInstance.getResult());
     }
 }

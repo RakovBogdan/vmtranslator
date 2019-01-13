@@ -30,7 +30,7 @@ public class Main {
             parser.advance();
             CommandType currentCommandType = parser.commandType();
             if (currentCommandType.equals(PUSH) || currentCommandType.equals(POP)) {
-                codeWriter.writePushPop(parser.arg1(), parser.arg2());
+                codeWriter.writePushPop(currentCommandType, parser.arg1(), parser.arg2());
             } else {
                 codeWriter.writeArithmetic(parser.getCurrentCommand());
             }
