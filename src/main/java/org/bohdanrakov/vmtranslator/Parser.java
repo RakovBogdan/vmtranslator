@@ -3,17 +3,15 @@ package org.bohdanrakov.vmtranslator;
 import org.apache.commons.lang3.StringUtils;
 import org.bohdanrakov.vmtranslator.commands.CommandType;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.bohdanrakov.vmtranslator.commands.CommandType.*;
-
 public class Parser {
 
-    private static final List<String> arithmeticCommandsNames = Stream.of("add",
-            "and", "eq", "gt", "lt", "neg", "not", "or", "sub").collect(Collectors.toList());
+    private static final Set<String> arithmeticCommandsNames = Stream.of("add",
+            "and", "eq", "gt", "lt", "neg", "not", "or", "sub").collect(Collectors.toSet());
     private static final String WHITESPACE = " ";
     private static final int COMMAND_TYPE_INDEX = 0;
     private List<String> commands;
