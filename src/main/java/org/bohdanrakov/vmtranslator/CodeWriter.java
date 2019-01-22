@@ -36,6 +36,9 @@ public class CodeWriter {
         Stream.of(CONSTANT).forEach(command -> addMemorySegmentCommand(CommandType.PUSH, command));
     }
 
+    private List<String> result = new ArrayList<>();
+    private int currentStackCommandIndex = 0;
+
     private static void addArithmeticCommandToMap(String commandKey) {
         ClassLoader classLoader = CodeWriter.class.getClassLoader();
         try {
@@ -59,11 +62,23 @@ public class CodeWriter {
         }
     }
 
-    private List<String> result = new ArrayList<>();
-
     public void writeArithmetic(String command) {
         List<String> asmInstructions = arithmeticCommands.get(command);
+        if (command.equals("eq")) {
+            asmInstructions.set(12, "@ISZERO" + String.valueOf(currentStackCommandIndex));
+            asmInstructions.set(15, "@SPPLUS" + String.valueOf(currentStackCommandIndex));
+            asmInstructions.set(17, "(ISZERO" + String.valueOf(currentStackCommandIndex) + ")");
+            asmInstructions.set(19, "(SPPLUS" + String.valueOf(currentStackCommandIndex) + ")");
+        }
+        if (command.equals("lt") | command.equals("gt")) {
+            asmInstructions.set(12, "@LT" + String.valueOf(currentStackCommandIndex));
+            asmInstructions.set(15, "@SPPLUS" + String.valueOf(currentStackCommandIndex));
+            asmInstructions.set(17, "(LT" + String.valueOf(currentStackCommandIndex) + ")");
+            asmInstructions.set(19, "(SPPLUS" + String.valueOf(currentStackCommandIndex) + ")");
+        }
+
         result.addAll(asmInstructions);
+        currentStackCommandIndex++;
     }
 
     public void writePushPop(CommandType commandType, String memorySegment, int index) {
@@ -74,6 +89,7 @@ public class CodeWriter {
         }
 
         result.addAll(asmInstructions);
+        currentStackCommandIndex++;
     }
 
     public List<String> getResult() {
