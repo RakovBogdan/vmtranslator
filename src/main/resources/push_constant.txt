@@ -1,4 +1,4 @@
-template
+@constant_value
 D=A
 @SP
 A=M

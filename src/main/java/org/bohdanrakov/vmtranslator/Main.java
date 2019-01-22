@@ -21,7 +21,7 @@ public class Main {
 
         List<String> asmCommands = translateVmToAsm(parser, codeWriter);
 
-        String newAssemblyFileName = FileUtil.changeExtensionInFileName(vmFileName, ASSEMBLY_EXTENSION);
+        String newAssemblyFileName = FileUtil.changeExtensionInFileName(vmFileName, ASSEMBLY_EXTENSION) + "2";
         FileUtil.writeLinesToNewFile(asmCommands, newAssemblyFileName);
     }
 

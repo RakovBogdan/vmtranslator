@@ -1,8 +1,7 @@
 package org.bohdanrakov.vmtranslator.commands;
 
-public enum CommandType {
-
-    ARITHMETIC, PUSH, POP, LABEL, GOTO, IF, FUNCTION, RETURN, CALL;
+public enum ArithmeticCommand {
+    ADD, SUB, EQ, LT, GT, AND, OR, NEG, NOT;
 
     @Override
     public String toString() {
