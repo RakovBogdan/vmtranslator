@@ -23,7 +23,16 @@ public class CodeWriter {
         commands = new HashMap<>();
         Arrays.stream(ArithmeticCommand.values()).forEach(
                 arithmeticCommand -> addCommandToMap(arithmeticCommand.toString()));
-        Stream.of(PUSH.toString() + UNDERSCORE + CONSTANT.toString()).forEach(CodeWriter::addCommandToMap);
+        Stream.of(PUSH.toString() + UNDERSCORE + CONSTANT.toString(),
+                PUSH.toString() + UNDERSCORE + LOCAL.toString(),
+                POP.toString() + UNDERSCORE + LOCAL.toString(),
+                PUSH.toString() + UNDERSCORE + ARGUMENT.toString(),
+                POP.toString() + UNDERSCORE + ARGUMENT.toString(),
+                PUSH.toString() + UNDERSCORE + THIS.toString(),
+                POP.toString() + UNDERSCORE + THIS.toString(),
+                PUSH.toString() + UNDERSCORE + THAT.toString(),
+                POP.toString() + UNDERSCORE + THAT.toString()
+                ).forEach(CodeWriter::addCommandToMap);
     }
 
     private List<String> result = new ArrayList<>();
