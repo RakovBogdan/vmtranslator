@@ -2,9 +2,7 @@
 D=M
 @add_to_address
 D=D+A
-@R13
-M=D
-A=M
+A=D
 D=M
 @SP
 A=M
