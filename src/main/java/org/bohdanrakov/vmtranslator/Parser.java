@@ -19,14 +19,14 @@ public class Parser {
     private int currentCommandIndex = 0;
 
     public Parser(List<String> lines) {
-        List<String> commands = lines.stream().map(line -> {
-            line = removeComments(line);
-            return line;
-        }).filter(StringUtils::isNotBlank).collect(Collectors.toList());
+        List<String> commands = lines.stream()
+                .map(Parser::removeComments)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toList());
         this.commands = commands;
     }
 
-    private String removeComments(String line) {
+    private static String removeComments(String line) {
         int commentPosition = line.indexOf("//");
         if (commentPosition != -1) {
             line = line.substring(0, commentPosition);
@@ -49,6 +49,7 @@ public class Parser {
         if (arithmeticCommandsNames.contains(commandType)) {
             return CommandType.ARITHMETIC;
         }
+        //This one is temporary
         return CommandType.valueOf(commandType.toUpperCase());
     }
 
