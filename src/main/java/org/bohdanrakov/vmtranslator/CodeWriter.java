@@ -18,6 +18,7 @@ public class CodeWriter {
     private static final String UNDERSCORE = "_";
     private static final List<String> arithmeticCommandsNames = Stream.of(
             "add", "sub", "eq", "lt", "gt", "and", "or", "neg", "not").collect(Collectors.toList());
+    private static final int TEMP_SEGMENT_START_INDEX = 5;
     private static Map<String, List<String>> commands;
 
     static {
@@ -25,6 +26,7 @@ public class CodeWriter {
         arithmeticCommandsNames.forEach(CodeWriter::addArithmeticCommandToMap);
         addConstantCommand();
         Stream.of("local", "argument", "this", "that").forEach(CodeWriter::addMemorySegmentCommands);
+        addTempCommand();
     }
 
     private List<String> result = new ArrayList<>();
@@ -69,6 +71,23 @@ public class CodeWriter {
         }
     }
 
+    private static void addTempCommand() {
+        ClassLoader classLoader = CodeWriter.class.getClassLoader();
+        List<String> asmPushInstructions;
+        List<String> asmPopInstructions;
+        try {
+            asmPushInstructions = IOUtils.readLines(
+                    classLoader.getResourceAsStream("push_temp" + TXT_EXTENSION), UTF_8);
+            asmPopInstructions = IOUtils.readLines(
+                    classLoader.getResourceAsStream("pop_temp" + TXT_EXTENSION), UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        commands.put("push_temp", asmPushInstructions);
+        commands.put("pop_temp", asmPopInstructions);
+    }
+
     public void writeArithmetic(String command) {
         List<String> asmInstructions = commands.get(command);
         if (command.equals("eq")) {
@@ -109,6 +128,14 @@ public class CodeWriter {
         if (memorySegment.equals("that")) {
             asmInstructions.set(0, "@THAT");
             asmInstructions.set(2, "@" + index);
+        }
+        if (memorySegment.equals("temp")) {
+            if (commandType.equals(CommandType.PUSH)) {
+                asmInstructions.set(0, "@" + String.valueOf(TEMP_SEGMENT_START_INDEX + index));
+            }
+            if (commandType.equals(CommandType.POP)) {
+                asmInstructions.set(3, "@" + String.valueOf(TEMP_SEGMENT_START_INDEX + index));
+            }
         }
 
         result.addAll(asmInstructions);
