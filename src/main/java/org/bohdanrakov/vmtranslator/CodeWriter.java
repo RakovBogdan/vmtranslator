@@ -27,6 +27,7 @@ public class CodeWriter {
         addConstantCommand();
         Stream.of("local", "argument", "this", "that").forEach(CodeWriter::addMemorySegmentCommands);
         addTempCommand();
+        addPointerCommand();
     }
 
     private List<String> result = new ArrayList<>();
@@ -88,6 +89,23 @@ public class CodeWriter {
         commands.put("pop_temp", asmPopInstructions);
     }
 
+    private static void addPointerCommand() {
+        ClassLoader classLoader = CodeWriter.class.getClassLoader();
+        List<String> asmPushInstructions;
+        List<String> asmPopInstructions;
+        try {
+            asmPushInstructions = IOUtils.readLines(
+                    classLoader.getResourceAsStream("push_pointer" + TXT_EXTENSION), UTF_8);
+            asmPopInstructions = IOUtils.readLines(
+                    classLoader.getResourceAsStream("pop_pointer" + TXT_EXTENSION), UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        commands.put("push_pointer", asmPushInstructions);
+        commands.put("pop_pointer", asmPopInstructions);
+    }
+
     public void writeArithmetic(String command) {
         List<String> asmInstructions = commands.get(command);
         if (command.equals("eq")) {
@@ -135,6 +153,22 @@ public class CodeWriter {
             }
             if (commandType.equals(CommandType.POP)) {
                 asmInstructions.set(3, "@" + String.valueOf(TEMP_SEGMENT_START_INDEX + index));
+            }
+        }
+        if (memorySegment.equals("pointer")) {
+            if (commandType.equals(CommandType.PUSH)) {
+                if (index == 0) {
+                    asmInstructions.set(0, "@" + "THIS");
+                } else {
+                    asmInstructions.set(0, "@" + "THAT");
+                }
+            }
+            if (commandType.equals(CommandType.POP)) {
+                if (index == 0) {
+                    asmInstructions.set(3, "@" + "THIS");
+                } else {
+                    asmInstructions.set(3, "@" + "THAT");
+                }
             }
         }
 
