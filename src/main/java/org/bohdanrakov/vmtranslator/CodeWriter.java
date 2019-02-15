@@ -28,10 +28,16 @@ public class CodeWriter {
         Stream.of("local", "argument", "this", "that").forEach(CodeWriter::addMemorySegmentCommands);
         addTempCommand();
         addPointerCommand();
+        addStaticCommand();
+    }
+
+    public CodeWriter(String filename) {
+        this.fileName = filename;
     }
 
     private List<String> result = new ArrayList<>();
     private int currentStackCommandIndex = 0;
+    private String fileName;
 
     private static void addArithmeticCommandToMap(String commandKey) {
         ClassLoader classLoader = CodeWriter.class.getClassLoader();
@@ -106,6 +112,23 @@ public class CodeWriter {
         commands.put("pop_pointer", asmPopInstructions);
     }
 
+    private static void addStaticCommand() {
+        ClassLoader classLoader = CodeWriter.class.getClassLoader();
+        List<String> asmPushInstructions;
+        List<String> asmPopInstructions;
+        try {
+            asmPushInstructions = IOUtils.readLines(
+                    classLoader.getResourceAsStream("push_static" + TXT_EXTENSION), UTF_8);
+            asmPopInstructions = IOUtils.readLines(
+                    classLoader.getResourceAsStream("pop_static" + TXT_EXTENSION), UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        commands.put("push_static", asmPushInstructions);
+        commands.put("pop_static", asmPopInstructions);
+    }
+
     public void writeArithmetic(String command) {
         List<String> asmInstructions = commands.get(command);
         if (command.equals("eq")) {
@@ -171,9 +194,21 @@ public class CodeWriter {
                 }
             }
         }
+        if (memorySegment.equals("static")) {
+            if (commandType.equals(CommandType.PUSH)) {
+
+            }
+            if (commandType.equals(CommandType.POP)) {
+
+            }
+        }
 
         result.addAll(asmInstructions);
         currentStackCommandIndex++;
+    }
+
+    public void write() {
+        FileUtil.writeLinesToNewFile(result, fileName);
     }
 
     public List<String> getResult() {

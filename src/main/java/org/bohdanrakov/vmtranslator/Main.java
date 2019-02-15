@@ -17,11 +17,11 @@ public class Main {
 
         List<String> lines = FileUtil.readFileLines(vmFileName);
         Parser parser = new Parser(lines);
-        CodeWriter codeWriter = new CodeWriter();
+        String newAssemblyFileName = FileUtil.changeExtensionInFileName(vmFileName, ASSEMBLY_EXTENSION);
+        CodeWriter codeWriter = new CodeWriter(newAssemblyFileName);
 
         List<String> asmCommands = translateVmToAsm(parser, codeWriter);
 
-        String newAssemblyFileName = FileUtil.changeExtensionInFileName(vmFileName, ASSEMBLY_EXTENSION);
         FileUtil.writeLinesToNewFile(asmCommands, newAssemblyFileName);
     }
 
