@@ -33,11 +33,13 @@ public class CodeWriter {
 
     public CodeWriter(String filename) {
         this.fileName = filename;
+        this.fileNameWithoutExtension = FileUtil.getFileNameWitohutExtension(fileName);
     }
 
     private List<String> result = new ArrayList<>();
     private int currentStackCommandIndex = 0;
     private String fileName;
+    private String fileNameWithoutExtension;
 
     private static void addArithmeticCommandToMap(String commandKey) {
         ClassLoader classLoader = CodeWriter.class.getClassLoader();
@@ -196,10 +198,10 @@ public class CodeWriter {
         }
         if (memorySegment.equals("static")) {
             if (commandType.equals(CommandType.PUSH)) {
-
+                asmInstructions.set(0, "@" + fileNameWithoutExtension + "." + index);
             }
             if (commandType.equals(CommandType.POP)) {
-
+                asmInstructions.set(3, "@" + fileNameWithoutExtension + "." + index);
             }
         }
 

@@ -19,13 +19,10 @@ public class Main {
         Parser parser = new Parser(lines);
         String newAssemblyFileName = FileUtil.changeExtensionInFileName(vmFileName, ASSEMBLY_EXTENSION);
         CodeWriter codeWriter = new CodeWriter(newAssemblyFileName);
-
-        List<String> asmCommands = translateVmToAsm(parser, codeWriter);
-
-        FileUtil.writeLinesToNewFile(asmCommands, newAssemblyFileName);
+        translateVmToAsm(parser, codeWriter);
     }
 
-    private static List<String> translateVmToAsm(Parser parser, CodeWriter codeWriter) {
+    private static void translateVmToAsm(Parser parser, CodeWriter codeWriter) {
         while (parser.hasMoreCommands()) {
             parser.advance();
             CommandType currentCommandType = parser.commandType();
@@ -35,6 +32,6 @@ public class Main {
                 codeWriter.writeArithmetic(parser.getCurrentCommand());
             }
         }
-        return codeWriter.getResult();
+        codeWriter.write();
     }
 }

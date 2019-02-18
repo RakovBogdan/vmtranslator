@@ -33,8 +33,12 @@ public class FileUtil {
         }
     }
 
+    public static String getFileNameWitohutExtension(String fileName) {
+        return fileName.substring(0, fileName.lastIndexOf('.'));
+    }
+
     public static String changeExtensionInFileName(String fileName, String newExtension) {
-        String nameWithoutExtension = fileName.substring(0, fileName.lastIndexOf('.'));
+        String nameWithoutExtension = getFileNameWitohutExtension(fileName);
         return nameWithoutExtension + newExtension;
     }
 }
