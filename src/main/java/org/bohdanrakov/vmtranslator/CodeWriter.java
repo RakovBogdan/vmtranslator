@@ -16,16 +16,14 @@ public class CodeWriter {
 
     static {
         commandTemplates = new HashMap<>();
-        Stream.of("add", "sub", "eq", "lt", "gt", "and", "or", "neg", "not")
+        Stream.of("add", "sub", "eq", "lt", "gt", "and", "or", "neg", "not",
+                "push_temp", "pop_temp", "push_static", "pop_static", "push_pointer", "pop_pointer", "push_constant")
                 .forEach(CodeWriter::addCommandTemplateToMap);
 
         Stream.of("local", "argument", "this", "that").forEach(memorySegment -> {
             addCommandTemplateToMap("push_segment", "push_" + memorySegment);
             addCommandTemplateToMap("pop_segment", "pop_" + memorySegment);
         });
-
-        Stream.of("push_temp", "pop_temp", "push_static", "pop_static", "push_pointer", "pop_pointer", "push_constant")
-                .forEach(CodeWriter::addCommandTemplateToMap);
     }
 
     private static void addCommandTemplateToMap(String templateName, String templateKey) {
