@@ -1,39 +1,41 @@
 package org.bohdanrakov.vmtranslator;
 
-import org.apache.commons.io.IOUtils;
 import org.bohdanrakov.vmtranslator.commands.CommandType;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CodeWriter {
 
-    private static final String TXT_EXTENSION = ".txt";
-    private static final String UTF_8 = "UTF-8";
     private static final String UNDERSCORE = "_";
-    private static final List<String> arithmeticCommandsNames = Stream.of(
-            "add", "sub", "eq", "lt", "gt", "and", "or", "neg", "not").collect(Collectors.toList());
     private static final int TEMP_SEGMENT_START_INDEX = 5;
-    private static Map<String, List<String>> commands;
+    private static Map<String, List<String>> commandTemplates;
 
     static {
-        commands = new HashMap<>();
-        arithmeticCommandsNames.forEach(CodeWriter::addArithmeticCommandToMap);
-        addConstantCommand();
-        Stream.of("local", "argument", "this", "that").forEach(CodeWriter::addMemorySegmentCommands);
-        addTempCommand();
-        addPointerCommand();
-        addStaticCommand();
+        commandTemplates = new HashMap<>();
+        Stream.of("add", "sub", "eq", "lt", "gt", "and", "or", "neg", "not")
+                .forEach(CodeWriter::addCommandTemplateToMap);
+
+        Stream.of("local", "argument", "this", "that").forEach(memorySegment -> {
+            addCommandTemplateToMap("push_segment", "push_" + memorySegment);
+            addCommandTemplateToMap("pop_segment", "pop_" + memorySegment);
+        });
+
+        Stream.of("push_temp", "pop_temp", "push_static", "pop_static", "push_pointer", "pop_pointer", "push_constant")
+                .forEach(CodeWriter::addCommandTemplateToMap);
     }
 
-    public CodeWriter(String filename) {
-        this.fileName = filename;
-        this.fileNameWithoutExtension = FileUtil.getFileNameWitohutExtension(fileName);
+    private static void addCommandTemplateToMap(String templateName, String templateKey) {
+        List<String> instructionsFromTemplate = FileUtil.getLinesFromResource(templateName);
+        commandTemplates.put(templateKey, instructionsFromTemplate);
+    }
+
+    private static void addCommandTemplateToMap(String templateName) {
+        List<String> instructionsFromTemplate = FileUtil.getLinesFromResource(templateName);
+        commandTemplates.put(templateName, instructionsFromTemplate);
     }
 
     private List<String> result = new ArrayList<>();
@@ -41,98 +43,13 @@ public class CodeWriter {
     private String fileName;
     private String fileNameWithoutExtension;
 
-    private static void addArithmeticCommandToMap(String commandKey) {
-        ClassLoader classLoader = CodeWriter.class.getClassLoader();
-        try {
-            List<String> asmInstructions = IOUtils.readLines(
-                    classLoader.getResourceAsStream(commandKey + TXT_EXTENSION), UTF_8);
-            commands.put(commandKey, asmInstructions);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void addMemorySegmentCommands(String memorySegment) {
-        ClassLoader classLoader = CodeWriter.class.getClassLoader();
-        List<String> asmPushInstructions;
-        List<String> asmPopInstructions;
-        try {
-            asmPushInstructions = IOUtils.readLines(
-                    classLoader.getResourceAsStream("push_argument" + TXT_EXTENSION), UTF_8);
-            asmPopInstructions = IOUtils.readLines(
-                    classLoader.getResourceAsStream("pop_argument" + TXT_EXTENSION), UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        commands.put("push" + UNDERSCORE + memorySegment, asmPushInstructions);
-        commands.put("pop" + UNDERSCORE + memorySegment, asmPopInstructions);
-    }
-
-    private static void addConstantCommand() {
-        ClassLoader classLoader = CodeWriter.class.getClassLoader();
-        try {
-            List<String> asmInstructions = IOUtils.readLines(
-                    classLoader.getResourceAsStream("push_constant" + TXT_EXTENSION), UTF_8);
-            commands.put("push_constant", asmInstructions);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private static void addTempCommand() {
-        ClassLoader classLoader = CodeWriter.class.getClassLoader();
-        List<String> asmPushInstructions;
-        List<String> asmPopInstructions;
-        try {
-            asmPushInstructions = IOUtils.readLines(
-                    classLoader.getResourceAsStream("push_temp" + TXT_EXTENSION), UTF_8);
-            asmPopInstructions = IOUtils.readLines(
-                    classLoader.getResourceAsStream("pop_temp" + TXT_EXTENSION), UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        commands.put("push_temp", asmPushInstructions);
-        commands.put("pop_temp", asmPopInstructions);
-    }
-
-    private static void addPointerCommand() {
-        ClassLoader classLoader = CodeWriter.class.getClassLoader();
-        List<String> asmPushInstructions;
-        List<String> asmPopInstructions;
-        try {
-            asmPushInstructions = IOUtils.readLines(
-                    classLoader.getResourceAsStream("push_pointer" + TXT_EXTENSION), UTF_8);
-            asmPopInstructions = IOUtils.readLines(
-                    classLoader.getResourceAsStream("pop_pointer" + TXT_EXTENSION), UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        commands.put("push_pointer", asmPushInstructions);
-        commands.put("pop_pointer", asmPopInstructions);
-    }
-
-    private static void addStaticCommand() {
-        ClassLoader classLoader = CodeWriter.class.getClassLoader();
-        List<String> asmPushInstructions;
-        List<String> asmPopInstructions;
-        try {
-            asmPushInstructions = IOUtils.readLines(
-                    classLoader.getResourceAsStream("push_static" + TXT_EXTENSION), UTF_8);
-            asmPopInstructions = IOUtils.readLines(
-                    classLoader.getResourceAsStream("pop_static" + TXT_EXTENSION), UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        commands.put("push_static", asmPushInstructions);
-        commands.put("pop_static", asmPopInstructions);
+    public CodeWriter(String filename) {
+        this.fileName = filename;
+        this.fileNameWithoutExtension = FileUtil.getFileNameWithoutExtension(fileName);
     }
 
     public void writeArithmetic(String command) {
-        List<String> asmInstructions = commands.get(command);
+        List<String> asmInstructions = commandTemplates.get(command);
         if (command.equals("eq")) {
             asmInstructions.set(12, "@ISZERO" + String.valueOf(currentStackCommandIndex));
             asmInstructions.set(15, "@SPPLUS" + String.valueOf(currentStackCommandIndex));
@@ -152,7 +69,7 @@ public class CodeWriter {
 
     public void writePushPop(CommandType commandType, String memorySegment, int index) {
         String memorySegmentIndex = String.valueOf(index);
-        List<String> asmInstructions = commands.get(commandType.toString() + UNDERSCORE + memorySegment);
+        List<String> asmInstructions = commandTemplates.get(commandType.toString() + UNDERSCORE + memorySegment);
         if (memorySegment.equals("constant")) {
             asmInstructions.set(0, "@" + memorySegmentIndex);
         }

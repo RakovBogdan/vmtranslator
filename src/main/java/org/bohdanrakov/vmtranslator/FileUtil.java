@@ -1,5 +1,7 @@
 package org.bohdanrakov.vmtranslator;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -9,6 +11,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FileUtil {
+
+    private static final String TXT_EXTENSION = ".txt";
+    private static final String UTF_8 = "UTF-8";
+
+    public static List<String> getLinesFromResource(String resourceName) {
+        ClassLoader classLoader = CodeWriter.class.getClassLoader();
+        try {
+            return IOUtils.readLines(
+                    classLoader.getResourceAsStream(resourceName + TXT_EXTENSION), UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static List<String> readFileLines(String fileName) {
         try (BufferedReader br = Files.newBufferedReader(Paths.get(fileName))) {
@@ -33,12 +48,12 @@ public class FileUtil {
         }
     }
 
-    public static String getFileNameWitohutExtension(String fileName) {
+    public static String getFileNameWithoutExtension(String fileName) {
         return fileName.substring(0, fileName.lastIndexOf('.'));
     }
 
     public static String changeExtensionInFileName(String fileName, String newExtension) {
-        String nameWithoutExtension = getFileNameWitohutExtension(fileName);
+        String nameWithoutExtension = getFileNameWithoutExtension(fileName);
         return nameWithoutExtension + newExtension;
     }
 }
