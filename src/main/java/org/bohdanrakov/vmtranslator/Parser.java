@@ -49,7 +49,9 @@ public class Parser {
         if (arithmeticCommandsNames.contains(commandType)) {
             return CommandType.ARITHMETIC;
         }
-        //This one is temporary
+        if (commandType.equals("if-goto")) {
+            return CommandType.IF;
+        }
         return CommandType.valueOf(commandType.toUpperCase());
     }
 

@@ -2,10 +2,7 @@ package org.bohdanrakov.vmtranslator;
 
 import org.bohdanrakov.vmtranslator.commands.CommandType;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class CodeWriter {
@@ -44,6 +41,28 @@ public class CodeWriter {
     public CodeWriter(String filename) {
         this.fileName = filename;
         this.fileNameWithoutExtension = FileUtil.getFileNameWithoutExtension(fileName);
+    }
+
+    public void writeLabel(String label) {
+        List<String> asmInstructions = new ArrayList<>();
+        asmInstructions.add("@" + label);
+        result.addAll(asmInstructions);
+    }
+
+    public void writeGoto(String label) {
+        List<String> asmInstructions = new ArrayList<>();
+        asmInstructions.add("@" + label);
+        asmInstructions.add("0;JMP");
+
+        result.addAll(asmInstructions);
+    }
+
+    public void writeIf(String label) {
+        List<String> asmInstructions = new ArrayList<>();
+        asmInstructions.add("@" + label);
+        asmInstructions.add("@" + label);
+
+        result.addAll(asmInstructions);
     }
 
     public void writeArithmetic(String command) {
