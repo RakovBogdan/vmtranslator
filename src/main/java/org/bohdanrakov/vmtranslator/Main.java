@@ -4,8 +4,7 @@ import org.bohdanrakov.vmtranslator.commands.CommandType;
 
 import java.util.List;
 
-import static org.bohdanrakov.vmtranslator.commands.CommandType.POP;
-import static org.bohdanrakov.vmtranslator.commands.CommandType.PUSH;
+import static org.bohdanrakov.vmtranslator.commands.CommandType.*;
 
 public class Main {
 
@@ -28,6 +27,12 @@ public class Main {
             CommandType currentCommandType = parser.commandType();
             if (currentCommandType.equals(PUSH) || currentCommandType.equals(POP)) {
                 codeWriter.writePushPop(currentCommandType, parser.arg1(), parser.arg2());
+            } else if (currentCommandType.equals(LABEL)) {
+                codeWriter.writeLabel(parser.arg1());
+            } else if (currentCommandType.equals(GOTO)) {
+                codeWriter.writeGoto(parser.arg1());
+            } else if (currentCommandType.equals(IF)) {
+                codeWriter.writeIf(parser.arg1());
             } else {
                 codeWriter.writeArithmetic(parser.getCurrentCommand());
             }

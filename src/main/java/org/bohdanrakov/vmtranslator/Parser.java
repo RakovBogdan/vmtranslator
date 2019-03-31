@@ -20,19 +20,19 @@ public class Parser {
 
     public Parser(List<String> lines) {
         List<String> commands = lines.stream()
-                .map(Parser::removeComments)
+                .map(Parser::removeCommentsAndWhitespaces)
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList());
         this.commands = commands;
     }
 
-    private static String removeComments(String line) {
+    private static String removeCommentsAndWhitespaces(String line) {
         int commentPosition = line.indexOf("//");
         if (commentPosition != -1) {
             line = line.substring(0, commentPosition);
         }
 
-        return line;
+        return line.trim();
     }
 
     public boolean hasMoreCommands() {

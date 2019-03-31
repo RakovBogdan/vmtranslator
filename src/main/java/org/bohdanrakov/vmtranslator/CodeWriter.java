@@ -45,7 +45,7 @@ public class CodeWriter {
 
     public void writeLabel(String label) {
         List<String> asmInstructions = new ArrayList<>();
-        asmInstructions.add("@" + label);
+        asmInstructions.add("(" + label + ")");
         result.addAll(asmInstructions);
     }
 
@@ -59,8 +59,11 @@ public class CodeWriter {
 
     public void writeIf(String label) {
         List<String> asmInstructions = new ArrayList<>();
+        asmInstructions.add("@SP");
+        asmInstructions.add("A=M-1");
+        asmInstructions.add("D=M");
         asmInstructions.add("@" + label);
-        asmInstructions.add("@" + label);
+        asmInstructions.add("D+1;JEQ");
 
         result.addAll(asmInstructions);
     }
@@ -72,8 +75,7 @@ public class CodeWriter {
             asmInstructions.set(15, "@SPPLUS" + String.valueOf(currentStackCommandIndex));
             asmInstructions.set(17, "(ISZERO" + String.valueOf(currentStackCommandIndex) + ")");
             asmInstructions.set(19, "(SPPLUS" + String.valueOf(currentStackCommandIndex) + ")");
-        }
-        if (command.equals("lt") || command.equals("gt")) {
+        } else if (command.equals("lt") || command.equals("gt")) {
             asmInstructions.set(12, "@LT" + String.valueOf(currentStackCommandIndex));
             asmInstructions.set(15, "@SPPLUS" + String.valueOf(currentStackCommandIndex));
             asmInstructions.set(17, "(LT" + String.valueOf(currentStackCommandIndex) + ")");
@@ -89,32 +91,26 @@ public class CodeWriter {
         List<String> asmInstructions = commandTemplates.get(commandType.toString() + UNDERSCORE + memorySegment);
         if (memorySegment.equals("constant")) {
             asmInstructions.set(0, "@" + memorySegmentIndex);
-        }
-        if (memorySegment.equals("argument")) {
+        } else if (memorySegment.equals("argument")) {
             asmInstructions.set(0, "@ARG");
             asmInstructions.set(2, "@" + index);
-        }
-        if (memorySegment.equals("local")) {
+        } else if (memorySegment.equals("local")) {
             asmInstructions.set(0, "@LCL");
             asmInstructions.set(2, "@" + index);
-        }
-        if (memorySegment.equals("this")) {
+        } else if (memorySegment.equals("this")) {
             asmInstructions.set(0, "@THIS");
             asmInstructions.set(2, "@" + index);
-        }
-        if (memorySegment.equals("that")) {
+        } else if (memorySegment.equals("that")) {
             asmInstructions.set(0, "@THAT");
             asmInstructions.set(2, "@" + index);
-        }
-        if (memorySegment.equals("temp")) {
+        } else if (memorySegment.equals("temp")) {
             if (commandType.equals(CommandType.PUSH)) {
                 asmInstructions.set(0, "@" + String.valueOf(TEMP_SEGMENT_START_INDEX + index));
-            }
-            if (commandType.equals(CommandType.POP)) {
+            } else if (commandType.equals(CommandType.POP)) {
                 asmInstructions.set(3, "@" + String.valueOf(TEMP_SEGMENT_START_INDEX + index));
             }
         }
-        if (memorySegment.equals("pointer")) {
+        else if (memorySegment.equals("pointer")) {
             if (commandType.equals(CommandType.PUSH)) {
                 if (index == 0) {
                     asmInstructions.set(0, "@" + "THIS");
@@ -122,7 +118,7 @@ public class CodeWriter {
                     asmInstructions.set(0, "@" + "THAT");
                 }
             }
-            if (commandType.equals(CommandType.POP)) {
+            else if (commandType.equals(CommandType.POP)) {
                 if (index == 0) {
                     asmInstructions.set(3, "@" + "THIS");
                 } else {
@@ -130,11 +126,11 @@ public class CodeWriter {
                 }
             }
         }
-        if (memorySegment.equals("static")) {
+        else if (memorySegment.equals("static")) {
             if (commandType.equals(CommandType.PUSH)) {
                 asmInstructions.set(0, "@" + fileNameWithoutExtension + "." + index);
             }
-            if (commandType.equals(CommandType.POP)) {
+            else if (commandType.equals(CommandType.POP)) {
                 asmInstructions.set(3, "@" + fileNameWithoutExtension + "." + index);
             }
         }
