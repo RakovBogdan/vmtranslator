@@ -60,10 +60,10 @@ public class CodeWriter {
     public void writeIf(String label) {
         List<String> asmInstructions = new ArrayList<>();
         asmInstructions.add("@SP");
-        asmInstructions.add("A=M-1");
+        asmInstructions.add("AM=M-1");
         asmInstructions.add("D=M");
         asmInstructions.add("@" + label);
-        asmInstructions.add("D+1;JEQ");
+        asmInstructions.add("D;JNE");
 
         result.addAll(asmInstructions);
     }
