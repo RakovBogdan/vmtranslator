@@ -43,6 +43,18 @@ public class CodeWriter {
         this.fileNameWithoutExtension = FileUtil.getFileNameWithoutExtension(fileName);
     }
 
+    public void writeInit() {
+        List<String> asmInstructions = new ArrayList<>();
+        asmInstructions.add("");
+        result.addAll(asmInstructions);
+    }
+
+    public void resetFileName() {
+        List<String> asmInstructions = new ArrayList<>();
+        asmInstructions.add("");
+        result.addAll(asmInstructions);
+    }
+
     public void writeLabel(String label) {
         List<String> asmInstructions = new ArrayList<>();
         asmInstructions.add("(" + label + ")");
@@ -67,6 +79,28 @@ public class CodeWriter {
 
         result.addAll(asmInstructions);
     }
+
+    public void writeFunction(String functionName, int variablesCount) {
+        List<String> asmInstructions = new ArrayList<>();
+        asmInstructions.add("@SP");
+
+        result.addAll(asmInstructions);
+    }
+
+    public void writeCall(String functionName, int argumentsCount) {
+        List<String> asmInstructions = new ArrayList<>();
+        asmInstructions.add("@SP");
+
+        result.addAll(asmInstructions);
+    }
+
+    public void writeReturn() {
+        List<String> asmInstructions = new ArrayList<>();
+        asmInstructions.add("@SP");
+
+        result.addAll(asmInstructions);
+    }
+
 
     public void writeArithmetic(String command) {
         List<String> asmInstructions = commandTemplates.get(command);
