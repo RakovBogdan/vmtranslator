@@ -33,6 +33,10 @@ public class Main {
                 codeWriter.writeGoto(parser.arg1());
             } else if (currentCommandType.equals(IF)) {
                 codeWriter.writeIf(parser.arg1());
+            } else if (currentCommandType.equals(FUNCTION)) {
+                codeWriter.writeFunction(parser.arg1(), parser.arg2());
+            } else if (currentCommandType.equals(RETURN)) {
+                codeWriter.writeReturn();
             } else {
                 codeWriter.writeArithmetic(parser.getCurrentCommand());
             }
