@@ -5,6 +5,8 @@ import org.bohdanrakov.vmtranslator.commands.CommandType;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static org.bohdanrakov.vmtranslator.commands.CommandType.PUSH;
+
 public class CodeWriter {
 
     private static final String UNDERSCORE = "_";
@@ -21,6 +23,8 @@ public class CodeWriter {
             addCommandTemplateToMap("push_segment", "push_" + memorySegment);
             addCommandTemplateToMap("pop_segment", "pop_" + memorySegment);
         });
+
+        addCommandTemplateToMap("return", "return");
     }
 
     private static void addCommandTemplateToMap(String templateName, String templateKey) {
@@ -81,10 +85,10 @@ public class CodeWriter {
     }
 
     public void writeFunction(String functionName, int variablesCount) {
-        List<String> asmInstructions = new ArrayList<>();
-        asmInstructions.add("@SP");
-
-        result.addAll(asmInstructions);
+        result.add("(" + functionName + ")");
+        for (int i = 0; i < variablesCount; i++) {
+            writePushPop(PUSH, "constant", 0);
+        }
     }
 
     public void writeCall(String functionName, int argumentsCount) {
@@ -95,9 +99,7 @@ public class CodeWriter {
     }
 
     public void writeReturn() {
-        List<String> asmInstructions = new ArrayList<>();
-        asmInstructions.add("@SP");
-
+        List<String> asmInstructions = commandTemplates.get("return");
         result.addAll(asmInstructions);
     }
 
@@ -138,14 +140,14 @@ public class CodeWriter {
             asmInstructions.set(0, "@THAT");
             asmInstructions.set(2, "@" + index);
         } else if (memorySegment.equals("temp")) {
-            if (commandType.equals(CommandType.PUSH)) {
+            if (commandType.equals(PUSH)) {
                 asmInstructions.set(0, "@" + String.valueOf(TEMP_SEGMENT_START_INDEX + index));
             } else if (commandType.equals(CommandType.POP)) {
                 asmInstructions.set(3, "@" + String.valueOf(TEMP_SEGMENT_START_INDEX + index));
             }
         }
         else if (memorySegment.equals("pointer")) {
-            if (commandType.equals(CommandType.PUSH)) {
+            if (commandType.equals(PUSH)) {
                 if (index == 0) {
                     asmInstructions.set(0, "@" + "THIS");
                 } else {
@@ -161,7 +163,7 @@ public class CodeWriter {
             }
         }
         else if (memorySegment.equals("static")) {
-            if (commandType.equals(CommandType.PUSH)) {
+            if (commandType.equals(PUSH)) {
                 asmInstructions.set(0, "@" + fileNameWithoutExtension + "." + index);
             }
             else if (commandType.equals(CommandType.POP)) {
