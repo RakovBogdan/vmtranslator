@@ -25,6 +25,7 @@ public class CodeWriter {
         });
 
         addCommandTemplateToMap("return", "return");
+        addCommandTemplateToMap("call", "call");
     }
 
     private static void addCommandTemplateToMap(String templateName, String templateKey) {
@@ -38,7 +39,9 @@ public class CodeWriter {
     }
 
     private List<String> result = new ArrayList<>();
-    private int currentStackCommandIndex = 0;
+    private int vmCommandJumpLabelIncrement = 0;
+    private int functionReturnLabelIncrement = 0;
+    private String currentFunctionName;
     private String fileName;
     private String fileNameWithoutExtension;
 
@@ -85,6 +88,8 @@ public class CodeWriter {
     }
 
     public void writeFunction(String functionName, int variablesCount) {
+        currentFunctionName = functionName;
+        functionReturnLabelIncrement = 0;
         result.add("(" + functionName + ")");
         for (int i = 0; i < variablesCount; i++) {
             writePushPop(PUSH, "constant", 0);
@@ -92,10 +97,13 @@ public class CodeWriter {
     }
 
     public void writeCall(String functionName, int argumentsCount) {
-        List<String> asmInstructions = new ArrayList<>();
-        asmInstructions.add("@SP");
-
+        List<String> asmInstructions = commandTemplates.get("call");
         result.addAll(asmInstructions);
+        String functionReturnLabel = fileName + "." + currentFunctionName + "$ret" + functionReturnLabelIncrement;
+        functionReturnLabelIncrement++;
+        result.set(0, functionReturnLabel);
+        result.set(54, "@" + functionName);
+        result.set(56, "(" + functionReturnLabel + ")");
     }
 
     public void writeReturn() {
@@ -107,19 +115,19 @@ public class CodeWriter {
     public void writeArithmetic(String command) {
         List<String> asmInstructions = commandTemplates.get(command);
         if (command.equals("eq")) {
-            asmInstructions.set(12, "@ISZERO" + String.valueOf(currentStackCommandIndex));
-            asmInstructions.set(15, "@SPPLUS" + String.valueOf(currentStackCommandIndex));
-            asmInstructions.set(17, "(ISZERO" + String.valueOf(currentStackCommandIndex) + ")");
-            asmInstructions.set(19, "(SPPLUS" + String.valueOf(currentStackCommandIndex) + ")");
+            asmInstructions.set(12, "@ISZERO" + String.valueOf(vmCommandJumpLabelIncrement));
+            asmInstructions.set(15, "@SPPLUS" + String.valueOf(vmCommandJumpLabelIncrement));
+            asmInstructions.set(17, "(ISZERO" + String.valueOf(vmCommandJumpLabelIncrement) + ")");
+            asmInstructions.set(19, "(SPPLUS" + String.valueOf(vmCommandJumpLabelIncrement) + ")");
         } else if (command.equals("lt") || command.equals("gt")) {
-            asmInstructions.set(12, "@LT" + String.valueOf(currentStackCommandIndex));
-            asmInstructions.set(15, "@SPPLUS" + String.valueOf(currentStackCommandIndex));
-            asmInstructions.set(17, "(LT" + String.valueOf(currentStackCommandIndex) + ")");
-            asmInstructions.set(19, "(SPPLUS" + String.valueOf(currentStackCommandIndex) + ")");
+            asmInstructions.set(12, "@LT" + String.valueOf(vmCommandJumpLabelIncrement));
+            asmInstructions.set(15, "@SPPLUS" + String.valueOf(vmCommandJumpLabelIncrement));
+            asmInstructions.set(17, "(LT" + String.valueOf(vmCommandJumpLabelIncrement) + ")");
+            asmInstructions.set(19, "(SPPLUS" + String.valueOf(vmCommandJumpLabelIncrement) + ")");
         }
 
         result.addAll(asmInstructions);
-        currentStackCommandIndex++;
+        vmCommandJumpLabelIncrement++;
     }
 
     public void writePushPop(CommandType commandType, String memorySegment, int index) {
@@ -172,7 +180,7 @@ public class CodeWriter {
         }
 
         result.addAll(asmInstructions);
-        currentStackCommandIndex++;
+        vmCommandJumpLabelIncrement++;
     }
 
     public void write() {
