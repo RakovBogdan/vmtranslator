@@ -43,7 +43,6 @@ public class CodeWriter {
     private int functionReturnLabelIncrement = 0;
     private String currentFunctionName;
     private String fileName;
-    private String fileNameWithExtension;
 
     public void writeInit() {
         result.add("@256");
@@ -55,7 +54,6 @@ public class CodeWriter {
     }
 
     public void setFileName(String fileNameWithExtension) {
-        this.fileNameWithExtension = fileNameWithExtension;
         this.fileName = FileUtil.getFileNameWithoutExtension(fileNameWithExtension);
     }
 
@@ -170,10 +168,6 @@ public class CodeWriter {
 
         result.addAll(asmInstructions);
         vmCommandJumpLabelIncrement++;
-    }
-
-    public void write() {
-        FileUtil.writeLinesToNewFile(result, fileNameWithExtension);
     }
 
     public List<String> getResult() {

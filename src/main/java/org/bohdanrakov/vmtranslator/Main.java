@@ -22,10 +22,10 @@ public class Main {
         for (String vmFileName: files) {
             List<String> lines = FileUtil.readFileLines(vmFileName);
             Parser parser = new Parser(lines);
-            String newAssemblyFileName = FileUtil.changeExtensionInFileName(vmFileName, ASSEMBLY_EXTENSION);
-            codeWriter.setFileName(newAssemblyFileName);
+            codeWriter.setFileName(vmFileName);
             translateVmToAsm(parser, codeWriter);
         }
+        FileUtil.writeLinesToNewFile(codeWriter.getResult(), resourceToParse + ".vm");
     }
 
     private static void translateVmToAsm(Parser parser, CodeWriter codeWriter) {
@@ -48,6 +48,5 @@ public class Main {
                 codeWriter.writeArithmetic(parser.getCurrentCommand());
             }
         }
-        codeWriter.write();
     }
 }

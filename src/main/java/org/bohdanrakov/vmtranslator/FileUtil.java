@@ -6,8 +6,11 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,14 +62,18 @@ public class FileUtil {
     }
 
     public static List<String> parseResourceToFiles(String resourceToParse) {
-        List<String> result = new ArrayList<>();
-
         if (Files.isDirectory(Paths.get(resourceToParse))) {
-
+            try {
+                return Files.walk(Paths.get(resourceToParse))
+                        .filter(Files::isRegularFile)
+                        .filter(path -> path.toString().endsWith(".vm"))
+                        .map(Path::toString)
+                        .collect(Collectors.toList());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         } else {
-            result.add(resourceToParse);
+            return Collections.singletonList(resourceToParse);
         }
-
-        return result;
     }
 }

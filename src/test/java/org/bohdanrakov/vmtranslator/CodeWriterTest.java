@@ -36,7 +36,8 @@ public class CodeWriterTest {
         expectedAdd.add("@SP");
         expectedAdd.add("M=M+1");
 
-        testInstance = new CodeWriter("fileName.vm");
+        testInstance = new CodeWriter();
+        testInstance.setFileName("fileName.vm");
         testInstance.writeArithmetic("add");
 
         assertEquals(expectedAdd, testInstance.getResult());
@@ -54,7 +55,8 @@ public class CodeWriterTest {
         expectedAdd.add("@SP");
         expectedAdd.add("M=M+1");
 
-        testInstance = new CodeWriter("fileName.vm");
+        testInstance = new CodeWriter();
+        testInstance.setFileName("fileName.vm");
         testInstance.writePushPop(PUSH, "constant", 1);
 
         assertEquals(expectedAdd, testInstance.getResult());
