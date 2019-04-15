@@ -2,6 +2,8 @@ package org.bohdanrakov.vmtranslator;
 
 import org.bohdanrakov.vmtranslator.commands.CommandType;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 import static org.bohdanrakov.vmtranslator.commands.CommandType.*;
@@ -11,14 +13,19 @@ public class Main {
     private static final String ASSEMBLY_EXTENSION = ".asm";
 
     public static void main(String[] args) {
+        CodeWriter codeWriter = new CodeWriter();
+        codeWriter.writeInit();
 
-        String vmFileName = args[0];
+        String resourceToParse = args[0];
+        List<String> files = FileUtil.parseResourceToFiles(resourceToParse);
 
-        List<String> lines = FileUtil.readFileLines(vmFileName);
-        Parser parser = new Parser(lines);
-        String newAssemblyFileName = FileUtil.changeExtensionInFileName(vmFileName, ASSEMBLY_EXTENSION);
-        CodeWriter codeWriter = new CodeWriter(newAssemblyFileName);
-        translateVmToAsm(parser, codeWriter);
+        for (String vmFileName: files) {
+            List<String> lines = FileUtil.readFileLines(vmFileName);
+            Parser parser = new Parser(lines);
+            String newAssemblyFileName = FileUtil.changeExtensionInFileName(vmFileName, ASSEMBLY_EXTENSION);
+            codeWriter.setFileName(newAssemblyFileName);
+            translateVmToAsm(parser, codeWriter);
+        }
     }
 
     private static void translateVmToAsm(Parser parser, CodeWriter codeWriter) {

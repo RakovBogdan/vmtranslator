@@ -7,6 +7,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -55,5 +56,17 @@ public class FileUtil {
     public static String changeExtensionInFileName(String fileName, String newExtension) {
         String nameWithoutExtension = getFileNameWithoutExtension(fileName);
         return nameWithoutExtension + newExtension;
+    }
+
+    public static List<String> parseResourceToFiles(String resourceToParse) {
+        List<String> result = new ArrayList<>();
+
+        if (Files.isDirectory(Paths.get(resourceToParse))) {
+
+        } else {
+            result.add(resourceToParse);
+        }
+
+        return result;
     }
 }

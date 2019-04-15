@@ -43,54 +43,43 @@ public class CodeWriter {
     private int functionReturnLabelIncrement = 0;
     private String currentFunctionName;
     private String fileName;
-    private String fileNameWithoutExtension;
-
-    public CodeWriter(String filename) {
-        this.fileName = filename;
-        this.fileNameWithoutExtension = FileUtil.getFileNameWithoutExtension(fileName);
-    }
+    private String fileNameWithExtension;
 
     public void writeInit() {
-        List<String> asmInstructions = new ArrayList<>();
-        asmInstructions.add("");
-        result.addAll(asmInstructions);
+        result.add("@256");
+        result.add("D=A");
+        result.add("@SP");
+        result.add("M=D");
+        result.add("@Sys.init");
+        result.add("0;JMP");
     }
 
-    public void resetFileName() {
-        List<String> asmInstructions = new ArrayList<>();
-        asmInstructions.add("");
-        result.addAll(asmInstructions);
+    public void setFileName(String fileNameWithExtension) {
+        this.fileNameWithExtension = fileNameWithExtension;
+        this.fileName = FileUtil.getFileNameWithoutExtension(fileNameWithExtension);
     }
 
     public void writeLabel(String label) {
-        List<String> asmInstructions = new ArrayList<>();
-        asmInstructions.add("(" + label + ")");
-        result.addAll(asmInstructions);
+        result.add("(" + fileName + "." + currentFunctionName + "$" + label + ")");
     }
 
     public void writeGoto(String label) {
-        List<String> asmInstructions = new ArrayList<>();
-        asmInstructions.add("@" + label);
-        asmInstructions.add("0;JMP");
-
-        result.addAll(asmInstructions);
+        result.add("@" + fileName + "." + currentFunctionName + "$" + label);
+        result.add("0;JMP");
     }
 
     public void writeIf(String label) {
-        List<String> asmInstructions = new ArrayList<>();
-        asmInstructions.add("@SP");
-        asmInstructions.add("AM=M-1");
-        asmInstructions.add("D=M");
-        asmInstructions.add("@" + label);
-        asmInstructions.add("D;JNE");
-
-        result.addAll(asmInstructions);
+        result.add("@SP");
+        result.add("AM=M-1");
+        result.add("D=M");
+        result.add("@" + fileName + "." + currentFunctionName + "$" + label);
+        result.add("D;JNE");
     }
 
     public void writeFunction(String functionName, int variablesCount) {
         currentFunctionName = functionName;
         functionReturnLabelIncrement = 0;
-        result.add("(" + functionName + ")");
+        result.add("(" + fileName + "." + functionName + ")");
         for (int i = 0; i < variablesCount; i++) {
             writePushPop(PUSH, "constant", 0);
         }
@@ -102,7 +91,7 @@ public class CodeWriter {
         String functionReturnLabel = fileName + "." + currentFunctionName + "$ret" + functionReturnLabelIncrement;
         functionReturnLabelIncrement++;
         result.set(0, functionReturnLabel);
-        result.set(54, "@" + functionName);
+        result.set(54, "@" + fileName + "." + functionName);
         result.set(56, "(" + functionReturnLabel + ")");
     }
 
@@ -172,10 +161,10 @@ public class CodeWriter {
         }
         else if (memorySegment.equals("static")) {
             if (commandType.equals(PUSH)) {
-                asmInstructions.set(0, "@" + fileNameWithoutExtension + "." + index);
+                asmInstructions.set(0, "@" + fileName + "." + index);
             }
             else if (commandType.equals(CommandType.POP)) {
-                asmInstructions.set(3, "@" + fileNameWithoutExtension + "." + index);
+                asmInstructions.set(3, "@" + fileName + "." + index);
             }
         }
 
@@ -184,7 +173,7 @@ public class CodeWriter {
     }
 
     public void write() {
-        FileUtil.writeLinesToNewFile(result, fileName);
+        FileUtil.writeLinesToNewFile(result, fileNameWithExtension);
     }
 
     public List<String> getResult() {
