@@ -29,8 +29,8 @@ public class FileUtil {
         }
     }
 
-    public static List<String> readFileLines(String fileName) {
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(fileName))) {
+    public static List<String> readFileLines(Path filePath) {
+        try (BufferedReader br = Files.newBufferedReader(filePath)) {
             return br.lines().collect(Collectors.toList());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -61,19 +61,18 @@ public class FileUtil {
         return nameWithoutExtension + newExtension;
     }
 
-    public static List<String> parseResourceToFiles(String resourceToParse) {
+    public static List<Path> parseResourceToFileNames(String resourceToParse) {
         if (Files.isDirectory(Paths.get(resourceToParse))) {
             try {
                 return Files.walk(Paths.get(resourceToParse))
                         .filter(Files::isRegularFile)
                         .filter(path -> path.toString().endsWith(".vm"))
-                        .map(Path::toString)
                         .collect(Collectors.toList());
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         } else {
-            return Collections.singletonList(resourceToParse);
+            return Collections.singletonList(Paths.get(resourceToParse));
         }
     }
 }

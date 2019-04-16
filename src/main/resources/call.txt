@@ -5,7 +5,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 @LCL
 D=M
 @SP
@@ -13,7 +12,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 @ARG
 D=M
 @SP
@@ -21,7 +19,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 @THIS
 D=M
 @SP
@@ -29,7 +26,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 @THAT
 D=M
 @SP
@@ -37,19 +33,16 @@ A=M
 M=D
 @SP
 M=M+1
-
 @SP
 D=M
 @5_PLUS_ARGUMENT_COUNT_TEMPLATE
 D=D-A
 @ARG
 M=D
-
 @SP
 D=M
 @LCL
 M=D
-
 @FUNCTION_NAME_TEMPLATE
 0;JMP
 (FUNCTION_RETURN_TEMPLATE)

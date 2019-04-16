@@ -53,16 +53,16 @@ public class CodeWriter {
         result.add("0;JMP");
     }
 
-    public void setFileName(String fileNameWithExtension) {
-        this.fileName = FileUtil.getFileNameWithoutExtension(fileNameWithExtension);
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
     }
 
     public void writeLabel(String label) {
-        result.add("(" + fileName + "." + currentFunctionName + "$" + label + ")");
+        result.add("(" + currentFunctionName + "$" + label + ")");
     }
 
     public void writeGoto(String label) {
-        result.add("@" + fileName + "." + currentFunctionName + "$" + label);
+        result.add("@" + currentFunctionName + "$" + label);
         result.add("0;JMP");
     }
 
@@ -70,14 +70,14 @@ public class CodeWriter {
         result.add("@SP");
         result.add("AM=M-1");
         result.add("D=M");
-        result.add("@" + fileName + "." + currentFunctionName + "$" + label);
+        result.add("@" + currentFunctionName + "$" + label);
         result.add("D;JNE");
     }
 
     public void writeFunction(String functionName, int variablesCount) {
         currentFunctionName = functionName;
         functionReturnLabelIncrement = 0;
-        result.add("(" + fileName + "." + functionName + ")");
+        result.add("(" + functionName + ")");
         for (int i = 0; i < variablesCount; i++) {
             writePushPop(PUSH, "constant", 0);
         }
@@ -85,12 +85,13 @@ public class CodeWriter {
 
     public void writeCall(String functionName, int argumentsCount) {
         List<String> asmInstructions = commandTemplates.get("call");
-        result.addAll(asmInstructions);
-        String functionReturnLabel = fileName + "." + currentFunctionName + "$ret" + functionReturnLabelIncrement;
+        String functionReturnLabel = currentFunctionName + "$ret" + functionReturnLabelIncrement;
         functionReturnLabelIncrement++;
-        result.set(0, functionReturnLabel);
-        result.set(54, "@" + fileName + "." + functionName);
-        result.set(56, "(" + functionReturnLabel + ")");
+        asmInstructions.set(0, "@" + functionReturnLabel);
+        asmInstructions.set(37, "@" + String.valueOf(5 + argumentsCount));
+        asmInstructions.set(45, "@" + functionName);
+        asmInstructions.set(47, "(" + functionReturnLabel + ")");
+        result.addAll(asmInstructions);
     }
 
     public void writeReturn() {

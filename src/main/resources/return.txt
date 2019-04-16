@@ -2,7 +2,6 @@
 D=M
 @R13
 M=D
-
 @R13
 D=M
 @5
@@ -11,25 +10,21 @@ A=D
 D=M
 @R14
 M=D
-
 @SP
 A=M-1
 D=M
 @ARG
 A=M
 M=D
-
 @ARG
 D=M+1
 @SP
 M=D
-
 @R13
 A=M-1
 D=M
 @THAT
 M=D
-
 @R13
 D=M
 @2
@@ -37,7 +32,6 @@ A=D-A
 D=M
 @THIS
 M=D
-
 @R13
 D=M
 @3
@@ -45,7 +39,6 @@ A=D-A
 D=M
 @ARG
 M=D
-
 @R13
 D=M
 @4
@@ -53,7 +46,6 @@ A=D-A
 D=M
 @LCL
 M=D
-
 @R14
 A=M
 0;JMP
