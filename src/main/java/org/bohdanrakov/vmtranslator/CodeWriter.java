@@ -49,8 +49,7 @@ public class CodeWriter {
         result.add("D=A");
         result.add("@SP");
         result.add("M=D");
-        result.add("@Sys.init");
-        result.add("0;JMP");
+        writeCall("Sys.init", 0);
     }
 
     public void setFileName(String fileName) {
